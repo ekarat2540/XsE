@@ -1,5 +1,5 @@
 # ใช้ OpenJDK 17 หรือ 21
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 
 # ตั้งค่าพอร์ตที่ต้องการให้ Spring Boot ใช้
 EXPOSE 8081
