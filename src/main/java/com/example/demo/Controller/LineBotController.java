@@ -79,51 +79,42 @@ public class LineBotController {
     private String processMessage(String messageText) {
         String[] lines = messageText.split("\n");
 
-        // เช็คว่าข้อความเป็น Order ID (#001) หรือไม่
-        if (messageText.startsWith("#")) {
-            return "กรุณาส่งสลิปสำหรับ Order " + messageText;
-        }
-
-        if (lines.length != 3) {
+        if (lines.length < 3) {
             return "❌ รูปแบบข้อความไม่ถูกต้อง กรุณาส่ง 3 บรรทัด";
         }
 
         String type = lines[0].trim();
-        String number = lines[1].trim();
-        double amount;
+        String[] numbers = lines[1].trim().split(",");
+        int amount;
         try {
             amount = Integer.parseInt(lines[2].trim());
         } catch (NumberFormatException e) {
             return "❌ จำนวนเงินไม่ถูกต้อง กรุณาระบุเป็นตัวเลข";
         }
 
-        double result = 0;
-        String reply = "";
-        String orderNumber = String.format("#%03d", orderCounter.getAndIncrement());
+        double rate = switch (type) {
+            case "3 ตัวล่าง" -> 450;
+            case "2 ตัวล่าง" -> 90;
+            case "3 ตัวโต๊ด" -> 100;
+            default -> -1;
+        };
 
-        switch (type) {
-            case "3 ตัวล่าง":
-                result = amount * 450;
-                break;
-            case "2 ตัวล่าง":
-                result = amount * 90;
-                break;
-            case "3 ตัวโต๊ด":
-                result = amount * 100;
-                break;
-            default:
-                return "❌ ประเภทตัวเลขไม่ถูกต้อง กรุณาเลือกจาก: 3 ตัวล่าง, 2 ตัวล่าง, 3 ตัวโต๊ด";
+        if (rate == -1) {
+            return "❌ ประเภทตัวเลขไม่ถูกต้อง กรุณาเลือกจาก: 3 ตัวล่าง, 2 ตัวล่าง, 3 ตัวโต๊ด";
         }
 
-        reply = "✅ ยืนยันรายการ\nหมายเลข: " + number + "\nยอดจ่าย: " + result + " บาท";
-        reply += "\nต้องโอน " + amount + " บาท " + "0972311021 พร้อมเพย์ เอกราช สุขประเสริฐ";
-        reply += "\nOrder = " + orderNumber;
+        double totalAmount = numbers.length * amount;
+        double totalPrice = numbers.length * amount * rate;
+        String orderNumber = String.format("#%03d", orderCounter.getAndIncrement());
 
-        // บันทึก Order และยอดเงินที่ต้องโอน
-        orderAmountMap.put(orderNumber, amount);
+        orderAmountMap.put(orderNumber, totalAmount);
 
-        return reply;
+        return String.format(
+                "✅ ยืนยันรายการ\nหมายเลข: %s\nยอดที่ต้องจ่าย: %.2f บาท\nโอนเงิน: %.2f บาท (0972311021 พร้อมเพย์)\nOrder = %s",
+                String.join(", ", numbers), totalPrice, totalAmount, orderNumber
+        );
     }
+
 
     private void handleImageMessage(String replyToken, String messageId) {
         try {
