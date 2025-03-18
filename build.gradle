@@ -1,0 +1,58 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(23)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// LINE Bot SDK
+	implementation 'com.linecorp.bot:line-bot-spring-boot:5.0.0'
+	implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+	implementation 'org.apache.httpcomponents:httpmime:4.5.13'
+
+	// สำหรับ JSON Processing
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	// Google Guava
+	implementation 'com.google.guava:guava:32.1.2-jre'
+
+	// OkHttp Logging Interceptor
+	implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+
+	// Retrofit2 Jackson Converter
+	implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// Spring Web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// DevTools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'com.google.zxing:core:3.5.1'
+	implementation 'com.google.zxing:javase:3.5.1'
+}
+
+
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
